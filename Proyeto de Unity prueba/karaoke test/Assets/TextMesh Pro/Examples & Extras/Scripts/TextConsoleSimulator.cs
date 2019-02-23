@@ -1,11 +1,17 @@
 using UnityEngine;
 using System.Collections;
-
+//using System;
 
 namespace TMPro.Examples
 {
     public class TextConsoleSimulator : MonoBehaviour
     {
+        public string estrofa;
+        public string estrofa1;
+        public string estrofa2;
+        public string estrofa3;
+
+
         private TMP_Text m_TextComponent;
         private bool hasTextChanged;
 
@@ -17,10 +23,28 @@ namespace TMPro.Examples
 
         void Start()
         {
-            StartCoroutine(RevealCharacters(m_TextComponent));
+            //StartCoroutine(RevealCharacters(m_TextComponent));
             //StartCoroutine(RevealWords(m_TextComponent));
+            StartCoroutine(cancion());
+
+
+
         }
 
+        private IEnumerator cancion()
+        {
+            m_TextComponent.text = estrofa;
+            StartCoroutine(RevealCharactersTEST(m_TextComponent,0.1f));
+            yield return new WaitForSeconds(5f);
+            m_TextComponent.text = estrofa1;
+            StartCoroutine(RevealCharactersTEST(m_TextComponent,0.5f));
+            yield return new WaitForSeconds(15f);
+            m_TextComponent.text = estrofa2;
+            StartCoroutine(RevealCharactersTEST(m_TextComponent,0.1f));
+            yield return new WaitForSeconds(15f);
+            m_TextComponent.text = estrofa3;
+            StartCoroutine(RevealCharactersTEST(m_TextComponent,0.2f));
+        }
 
         void OnEnable()
         {
@@ -72,7 +96,8 @@ namespace TMPro.Examples
 
                 visibleCount += 1;
 
-                yield return null;
+                //yield return null;
+                yield return new WaitForSeconds(0.5f);
             }
         }
 
@@ -109,11 +134,51 @@ namespace TMPro.Examples
                 if (visibleCount >= totalVisibleCharacters)
                 {
                     yield return new WaitForSeconds(1.0f);
+
                 }
 
                 counter += 1;
 
                 yield return new WaitForSeconds(0.1f);
+            }
+        }
+
+        /// <summary>
+        /// Method revealing the text one character at a time.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerator RevealCharactersTEST(TMP_Text textComponent, float velocidad)
+        {
+            textComponent.ForceMeshUpdate();
+
+            TMP_TextInfo textInfo = textComponent.textInfo;
+
+            int totalVisibleCharacters = textInfo.characterCount; // Get # of Visible Character in text object
+            int visibleCount = 0;
+
+            bool flag = true;
+
+            while (flag)
+            {
+                if (hasTextChanged)
+                {
+                    totalVisibleCharacters = textInfo.characterCount; // Update visible character count.
+                    hasTextChanged = false;
+                }
+
+                if (visibleCount > totalVisibleCharacters)
+                {
+                    yield return new WaitForSeconds(1.0f);
+                    flag = false;
+                    visibleCount = 0;
+                }
+
+                textComponent.maxVisibleCharacters = visibleCount; // How many characters should TextMeshPro display?
+
+                visibleCount += 1;
+
+                //yield return null;
+                yield return new WaitForSeconds(velocidad);
             }
         }
 
